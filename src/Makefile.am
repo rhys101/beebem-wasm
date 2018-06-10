@@ -10,8 +10,8 @@ SUBDIRS = gui
 #INCLUDES        = @GTK_CFLAGS@ -I@top_srcdir@/src/gui
 #LDADD           = @GTK_LIBS@ @top_srcdir@/src/gui/libeg.a
 
-INCLUDES        = @GTK_CFLAGS@ -I@top_srcdir@/src/gui -I@top_srcdir@/src/
-LDADD           = @GTK_LIBS@ @top_srcdir@/src/gui/libeg.a
+INCLUDES        =  -I@top_srcdir@/src/gui -I@top_srcdir@/src/
+LDADD           =  @top_srcdir@/src/gui/libeg.a
 
 
 CXX = @CXX@ -Wall -DDATA_DIR=\"$(pkgdatadir)\" 

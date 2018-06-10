@@ -1,28 +1,24 @@
-** THIS IS A PRE-RELEASE! **
+The unix version of BeebEm, writtin in C++ and SDL, has been compiled into WebAssembly using Emscripen.
 
-To install:
+You can find a working example at [https://beeb.webassembly.link].
 
----
+BeebEm 0.0.13 has support for Emulation of BBC model B, B+, Integra Board and Master 128 and support for Acorn 65C02, Acorn Z80, Torch Z80 and Acorn 80186 second processors. 
 
-Install in home account (for a specific user only):
+To build, follow the guide at [https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html] to install Emscripten. Then:
 
+./reconf
+automake --add-missing
 
-# Extract the source code tarball:
-tar zxvf beebem-0.0.8.tar.gz
-cd beebem-0.0.8
-
-./configure --prefix=$HOME/test --enable-econet
-make
-make install
-
----
-
-Install as root (global install for all users):
+emconfigure ./configure CXXFLAGS='-g -O3 -s USE_ZLIB=1 -s USE_SDL=2'
+emmake make
 
 
-tar zxvf beebem-0.0.8.tar.gz
-cd beebem-0.0.8
+To deploy as a WASM binary:
 
-./configure --enable-econet
-make
-make install-strip
+mkdir -p usr/local/share
+cp -a data usr/local/share/beebem
+
+cp src/beebem beebem.bc
+emcc -O3 beebem.bc -o beebem.html --preload-file usr/local/share/beebem/ --use-preload-plugins -s TOTAL_MEMORY=256MB -s WASM=1 -s USE_SDL=2 -s USE_ZLIB=1
+
+You will then have a .html .js .wasm and .data file.

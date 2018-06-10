@@ -17,7 +17,7 @@ AC_PROG_INSTALL
 
 
 # dnl Checks for GTK libraries.
-AM_PATH_GTK_2_0(2.2.0,,AC_MSG_ERROR(mypkgname 0.1 needs GTK+ 2.2.0))
+#AM_PATH_GTK_2_0(2.2.0,,AC_MSG_ERROR(mypkgname 0.1 needs GTK+ 2.2.0))
 
 
 
