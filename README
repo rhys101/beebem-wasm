@@ -22,3 +22,6 @@ cp src/beebem beebem.bc
 emcc -O3 beebem.bc -o beebem.html --preload-file usr/local/share/beebem/ --use-preload-plugins -s TOTAL_MEMORY=256MB -s WASM=1 -s USE_SDL=2 -s USE_ZLIB=1
 
 You will then have a .html .js .wasm and .data file.
+
+The original BeebEm for Unix is at [http://beebem-unix.bbcmicro.com/]
+
