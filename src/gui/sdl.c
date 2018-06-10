@@ -149,9 +149,9 @@ static EG_BOOL EG_DrawString_Initialise(void)
         }
 
         // Set color key
-	SDL_SetColorKey(label_low, SDL_SRCCOLORKEY
+	SDL_SetColorKey(label_low, SDL_TRUE
 	 , SDL_MapRGB(label_low->format, 255,255,255));
-	SDL_SetColorKey(label_high, SDL_SRCCOLORKEY
+	SDL_SetColorKey(label_high, SDL_TRUE
 	 , SDL_MapRGB(label_high->format, 255,255,255));
 
 	return(EG_TRUE);

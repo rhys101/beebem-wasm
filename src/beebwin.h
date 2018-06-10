@@ -110,7 +110,7 @@ class BeebWin  {
 	bool CursorShouldBeHidden(void){if (m_HideCursor)return true; else return false;}
 //<+
 
-	void doHorizLine(unsigned long Col, int y, int sx, int width);
+	void doHorizLine(unsigned int Col, int y, int sx, int width);
 	void doInvHorizLine(unsigned long Col, int y, int sx, int width);
 	void doUHorizLine(unsigned long Col, int y, int sx, int width);
 

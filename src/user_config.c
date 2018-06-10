@@ -324,7 +324,7 @@ static BOOL CopyFile(char *source_file, char *dest_file)
 	/* Use 'cp' command instead of copying the files in C (cp must be
 	 * in your PATH).
 	 */
-#ifdef WITH_SYSTEM_CP
+#ifndef WITH_SYSTEM_CP // ARJ
 	char command[5*1024];
 
 	sprintf(command, "cp %s %s", source_file, dest_file);
@@ -444,7 +444,7 @@ char* GetUserConfigPath(char *path, size_t len)
 	 */
 	path[0] = 0;
 
-#ifdef WITH_UNIX_EXTRAS
+#ifndef WITH_UNIX_EXTRAS // ARJ
 	struct passwd *pw_ptr;
 
 	/* Find user in password database.
@@ -820,7 +820,7 @@ BOOL CopyScsiImagesToUser(char *filepath)
 
 #define  NUMBER_OF_FILES 9
 	char files[NUMBER_OF_FILES][20]={
-		"sasi0.dat",
+	  //		"sasi0.dat", // ARJ
 		"scsi0.dat", "scsi0.dsc",
 		"scsi1.dat", "scsi1.dsc",
 		"scsi2.dat", "scsi2.dsc",

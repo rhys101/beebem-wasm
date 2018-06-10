@@ -1170,7 +1170,6 @@ void LoadSimpleDiscImage(char *FileName, int DriveNum,int HeadNum, int Tracks) {
   };
 
   mainWin->SetImageName(FileName,DriveNum,0);
-
   strcpy(FileNames[DriveNum], FileName);
   NumHeads[DriveNum] = 1;
 

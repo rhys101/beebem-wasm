@@ -798,7 +798,8 @@ void SwitchOnSound(void) {
 
 void SetSound(char State) {
 	if (!SoundEnabled) return;
-	if (State==MUTED) MuteSound();
+	if (State==MUTED) {MuteSound(); SDL_PauseAudio(1);} // ARJ
+	else {	SDL_PauseAudio(0); } // ARJ
 }
 
 

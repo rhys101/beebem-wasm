@@ -21,6 +21,8 @@
 /* Conveted to use DirectX - Mike Wyatt 11/1/98 */
 // Econet added Rob O'Donnell. robert@irrelevant.com. 28/12/2004.
 
+#include <emscripten.h>
+
 #if HAVE_CONFIG_H
 #	include <config.h>
 #endif
@@ -451,7 +453,7 @@ BeebWin::~BeebWin()
 //+>
 //## From beebwin.h
 
-void BeebWin::doHorizLine(unsigned long Col, int y, int sx, int width) {
+void BeebWin::doHorizLine(unsigned int Col, int y, int sx, int width) {
 //->            if (TeletextEnabled) y/=TeletextStyle;
 //--            int d = (y*800)+sx+ScreenAdjust+(TeletextEnabled?36:0);
 //--            if ((d+width)>(500*800)) return;
@@ -504,13 +506,18 @@ void BeebWin::doHorizLine(unsigned long Col, int y, int sx, int width) {
 
                 if ( d < 0) { return; } // qERROR("[0332]: d < 0"); return; }
 
-                p = (unsigned char*) GetSDLScreenLinePtr(y-2);
+		// ARJ
+		//memset(((unsigned char*)video_output->pixels + (y-2) * video_output->pitch) + (unsinged char *)d, Col, width);
+		//unsigned char *x = (unsigned char *)video_output->pixels + (y-2)*video_output->pitch + d;
+		//unsigned char *x = (unsigned char *)video_output->image->data + (y-2)*video_output->pitch + d;
+                p = GetSDLScreenLinePtr(y-2);
                 if (p == NULL){
                         qERROR("GetSDLScreenLinePtr returned NULL!");
                         exit(1);
                 }else{
-                        memset(p + d, Col, width);
+		  memset((p+d), Col, width);
                 }
+				
 //<-
         };
 
@@ -2050,6 +2057,8 @@ void BeebWin::updateLines(HDC hDC, int starty, int nlines)
 			RenderLine(i+starty, (int) TeletextEnabled, ScreenAdjust);
 
 	}
+
+	RenderTexture();
 //<+
 
 }
@@ -2105,7 +2114,7 @@ BOOL BeebWin::UpdateTiming(void)
 		DisplayTiming();
 	}
 
-	// Now we work out if BeebEm is running too fast or not
+	// Now we work out if BeebEm is runnsing too fast or not
 	if (m_RealTimeTarget > 0.0)
 	{
 		Ticks = TickCount - m_TickBase;
@@ -2171,7 +2180,6 @@ BOOL BeebWin::UpdateTiming(void)
 
 	m_LastTickCount = TickCount;
 	m_LastTotalCycles = TotalCycles;
-
 	return UpdateScreen;
 }
 
@@ -2182,6 +2190,7 @@ void BeebWin::DisplayTiming(void)
 	{
 		sprintf(m_szTitle, "%s  Speed: %2.2f  fps: %2d",
 				WindowTitle, m_RelativeSpeed, (int)m_FramesPerSecond);
+		printf("Timing: %s\n", m_szTitle);
 		SetWindowText(m_hWnd, m_szTitle);
 	}
 }
@@ -2562,17 +2571,39 @@ void BeebWin::EjectDiscImage(int Drive)
 //<+
 }
 
+
+// ARJ Call out to JS for url
+EM_JS(char*, browser_get_disc, (int drive), {
+    console.log("get_disc : "+drive);
+    console.log(window.beebem);
+    var jsString = '';
+    if (drive==0) jsString = window.beebem.disc1;
+    if (drive==1) jsString = window.beebem.disc2;
+    if (jsString == '#error') jsString = '';
+  // 'jsString.length' would return the length of the string as UTF-16
+  // units, but Emscripten C strings operate as UTF-8.
+    var lengthBytes = lengthBytesUTF8(jsString)+1;
+    var stringOnWasmHeap = _malloc(lengthBytes);
+    stringToUTF8(jsString, stringOnWasmHeap, lengthBytes+1);
+    return stringOnWasmHeap;
+});
+
+
 /****************************************************************************/
 int BeebWin::ReadDisc(int Drive,HMENU dmenu)
 {
 //--	char DefaultPath[_MAX_PATH];
 //->	char FileName[256];
 //++
-	static char FileName[1024]="";
+  static char FileName[1024]="";
+
+  strcpy(FileName, browser_get_disc(Drive));
+  
 //<-
 
 //+>
-        SysReg.GetStringValue(HKEY_CURRENT_USER, CFG_REG_KEY, "DiscsPath", FileName);
+ // ARJ
+//        SysReg.GetStringValue(HKEY_CURRENT_USER, CFG_REG_KEY, "DiscsPath", FileName);
 //<+
 
 
@@ -2617,8 +2648,12 @@ int BeebWin::ReadDisc(int Drive,HMENU dmenu)
 //+>
 //<+
 
-	gotName = Open_GTK_File_Selector(FileName);
-
+	//gotName = Open_GTK_File_Selector(FileName);
+	//printf("Open_GTK_File_Selector\n"); // ARJ
+	gotName = strlen(FileName)>0;
+	//gotName=TRUE;
+		//strcpy(FileName, "/usr/local/share/beebem/media/discs/games.ssd");
+	
 	if (gotName)
 	{
 //--		unsigned PathLength = strrchr(FileName, '\\') - FileName;
@@ -2757,7 +2792,9 @@ void BeebWin::LoadTape(void)
 //--
 //--	if (GetOpenFileName(&ofn))
 //+>
-        if (Open_GTK_File_Selector(FileName) == true)
+        //if (Open_GTK_File_Selector(FileName) == true)
+	printf("Open_GTK_File_Selector 2 \n");
+	if (1==0) 
 //<+
 	{
 //--		unsigned PathLength = strrchr(FileName, '\\') - FileName;
@@ -2840,7 +2877,10 @@ void BeebWin::NewTapeImage(char *FileName)
 
 	/* Request new filename from user:
 	 */
-	if (Save_GTK_File_Selector(FileName) != true) {
+	// ARJ
+	//printf("Save_GTK_File_Selector\n");
+	if (1==0) {
+	  //if (Save_GTK_File_Selector(FileName) != true) {
 		/* If none given, or file dialog returned error
 		 * fail:
 		 */
@@ -2988,7 +3028,9 @@ void BeebWin::NewDiscImage(int Drive)
 //--
 //--	if (GetSaveFileName(&ofn))
 //++
-	if (Save_GTK_File_Selector(FileName) == true) {
+	printf("Save_GTK_File_Selector 2\n");
+	//if (Save_GTK_File_Selector(FileName) == true) {
+	if(1==0) {
 //++<
 //--	{
 //--		unsigned PathLength = strrchr(FileName, '\\') - FileName;
@@ -3112,7 +3154,9 @@ void BeebWin::SaveState()
 //--
 //--	if (GetSaveFileName(&ofn))
 
-	if (Save_GTK_File_Selector(FileName) == true)
+	printf("Save_GTK_File_Selector 3\n");
+	//if (Save_GTK_File_Selector(FileName) == true)
+	if (1==0)
 	{
 //--		unsigned PathLength = strrchr(FileName, '\\') - FileName;
 //--		strncpy(DefaultPath, FileName, PathLength);
@@ -3175,7 +3219,9 @@ void BeebWin::RestoreState()
 //--
 //--	if (GetOpenFileName(&ofn))
 
-	if (Open_GTK_File_Selector(FileName))	
+	printf("Open_GTK_File_Selector 3\n");
+	//if (Open_GTK_File_Selector(FileName))
+	if(1==0)
 	{
 //--		unsigned PathLength = strrchr(FileName, '\\') - FileName;
 //--		strncpy(DefaultPath, FileName, PathLength);
@@ -4078,12 +4124,14 @@ void BeebWin::LoadPreferences()
 	if (SysReg.GetDWORDValue(HKEY_CURRENT_USER, CFG_REG_KEY, CFG_WINDOWEDRESOLUTION, dword))
 		cfg_Windowed_Resolution = (int) dword;
 	else
-		cfg_Windowed_Resolution = RESOLUTION_640X480_S;
+	  //cfg_Windowed_Resolution = RESOLUTION_640X480_S;
+	  cfg_Windowed_Resolution = RESOLUTION_640X512; // ARJ
 
 	if (SysReg.GetDWORDValue(HKEY_CURRENT_USER, CFG_REG_KEY, CFG_FULLSCREENRESOLUTION, dword))
 		cfg_Fullscreen_Resolution = (int) dword;
 	else
-		cfg_Fullscreen_Resolution = RESOLUTION_640X480_S;
+	  //cfg_Fullscreen_Resolution = RESOLUTION_640X480_S;
+	  cfg_Fullscreen_Resolution = RESOLUTION_640X512; // ARJ
 
 	Destroy_Screen();
 	Create_Screen();

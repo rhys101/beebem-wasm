@@ -43,15 +43,11 @@
 #else
 #       define CHECK_EG_WINDOW_IS_VALID(o, r) \
                 if (o == NULL){ \
-                        EG_Log(EG_LOG_WARNING, dL"EG_Window pointer is NULL." \
-                         , dR); \
                         return(r); \
                 }
 
 #       define CHECK_EG_WINDOW_IS_VALID_VOID(o) \
                 if (o == NULL){ \
-                        EG_Log(EG_LOG_WARNING, dL"EG_Window pointer is NULL." \
-                        , dR); \
                         return; \
                 }
 #endif

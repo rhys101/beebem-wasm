@@ -19,6 +19,7 @@
 /****************************************************************************/
 /* Mike Wyatt and NRM's port to win32 - 7/6/97 */
 
+#include <emscripten.h>
 
 #if HAVE_CONFIG_H
 # include <config.h>
@@ -74,6 +75,8 @@
 #include "beebem_pages.h"
 #include "fake_registry.h"
 
+#include "beebemrc.h"
+
 // Can remove this (only needed to calc string hash)
 //#include <gui_functions.h>
 
@@ -86,6 +89,13 @@
  */
 int __argc = 0;
 char **__argv = NULL;
+
+int X11_CapsLock_Down;
+Uint32 ticks;
+
+// ARJ
+int autoboot;
+
 
 /* This needs to be fixed.. ----
  */
@@ -119,7 +129,7 @@ FILE *tlog;
 //----------------------------------------------
 
 int done = 0;
-/////////////////////////////////int fullscreen = 0;
+//int fullscreen = 0;
 int showing_menu = 0;
 EG_Window *displayed_window_ptr = NULL;
 
@@ -205,122 +215,12 @@ void Quit(void)
 }
 
 
-
-//------------------------------------------------
-
-//-- int CALLBACK WinMain(HINSTANCE hInstance, 
-//-- 					HINSTANCE hPrevInstance,
-//-- 					LPSTR lpszCmdLine,
-//-- 					int nCmdShow)
-//-- { 
-int main(int argc, char *argv[]){
-//--	MSG msg;
-
-	//printf("%d\n", testingit(1, 2, 3));
-
-
-
-//	print_message();
-//	SDL_Delay(5000);
-
-/*
-#define STRING_HASH "EG_Widget_Type_ToggleButton"
-	printf(STRING_HASH " %lX\n", EG_MakeStringHash(STRING_HASH) );
-	exit(1);
-*/
-
-//+>
-	int X11_CapsLock_Down;
-	Uint32 ticks=SDL_GetTicks();
-//	int mouse_x=0, mouse_y=0, mouse_move_x, mouse_move_y;
-//	BOOL ignore_next_mouse_movement = FALSE;
-//	int buttons=0;
-//<+
-
-//--	hInst = hInstance;
-
-	/* Create global reference to command line args (like windows does)
-	 */
-	__argc = argc;
-	__argv = (char**) argv;
-
-	
-
-
-	/* Initialise debugging subsystem.
-	 */
-	Log_Init();
-
-	/* Initialize SDL resources.
-	 */
-	if (! InitialiseSDL(argc, argv)){
-		qFATAL("Unable to initialise SDL library!");
-		exit(1);
-	}
-
-/* Initialize GUI API
- */
-	if (EG_Initialize() == EG_TRUE){
-		qINFO("EG initialized.");
-	}else{
-		qFATAL("EG failed to initialize! Quiting.");
-		exit(1);
-	}
-
-
-	/* Build menus:
-	*/
-	if (InitializeBeebEmGUI(screen_ptr) != EG_TRUE)
-		exit(1);
-
-	/* Initialize fake windows registry:
-	 */
-	InitializeFakeRegistry();
-
-	/* ---------------------------------------
-	 */
-
-	// Create instance of Emulator core:
-	mainWin=new BeebWin();
-	mainWin->Initialise();
-
-	/* ------------------------------------------------------
-	 */
-
-	// Create serial threads
-//--	InitThreads();
-//--	CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) SerialThread,NULL,0,&iSerialThread);
-//--	CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) StatThread,NULL,0,&iStatThread);
-
-	/* -------------------------------------------------0----------
-	 */
-
-//    tlog = fopen("\\trace.log", "wt");
-
-
-	/* Clear SDL event queue
-	 */
-	EG_Draw_FlushEventQueue();
-
+void one_iter() {
 	/* Main loop converted to SDL:
 	 */
-	X11_CapsLock_Down = 0;	// =0 not down, used to emulate a key release in X11 (caps has no release event).
 
 
-
-
-
-
-
-
-
-/* THIS WILL EVENTUALLY MOVE INTO beebwin.cpp when the MFC event loop is faked
- * (until then the rest of this file will be a mess):
- * -------------------------------------------
- */
-
-//	pDEBUG(dL"Got to main loop!", dR);
-	done = 0; do{
+  //  	done = 0; do {
 
 //--		if(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) || mainWin->IsFrozen())
 //--		{
@@ -359,6 +259,7 @@ int main(int argc, char *argv[]){
 		 */
 		if (!mainWin->IsFrozen())
 			Exec6502Instruction();
+
 
 		/* If the mouse cursor should be hidden (set on GUI),
 		 * then make sure it is hidden after a suitable delay.
@@ -455,15 +356,10 @@ int main(int argc, char *argv[]){
 			case SDL_KEYUP:
 				{
 					int pressed=0, col=0, row=0;
-			
 
 					if (event.key.keysym.sym == SDLK_F12 || event.key.keysym.sym == SDLK_F11 || event.key.keysym.sym == SDLK_MENU){
 						Show_Main();
 					}
-
-		
-
-
 
 
 					pressed = col = row = 0;
@@ -478,7 +374,6 @@ int main(int argc, char *argv[]){
 					/* Convert SDL key press into BBC key press:
 					 */
 					if (ConvertSDLKeyToBBCKey(event.key.keysym /*, &pressed */, &col, &row)){
-
 						/* If X11 and Caps Lock then release automatically after 20
 						 * passes to the emulator core (doesn't X11 suck)..
 						 *
@@ -575,10 +470,10 @@ int main(int argc, char *argv[]){
 				EG_Window_ProcessEvent(displayed_window_ptr, &event, 0, 0);
 			}
 
-//			printf("Menu mode.\n");
-			SDL_Delay(10);
+			//printf("Menu mode.\n");
+			//SDL_Delay(10); // ARJ
 			EG_Window_ProcessEvent(displayed_window_ptr, NULL, 0, 0);
-
+			RenderTexture();
 			/* Record time so we can hide the mouse cursor after a small delay.
 			 */
 			ticks = SDL_GetTicks();
@@ -586,11 +481,246 @@ int main(int argc, char *argv[]){
 
 		}
 
-//	printf("%d\n", AMXButtons);
+		//	printf("%d\n", AMXButtons);
 
 
 //--	} while(1);
+//	} while(done==0);
+
+}
+
+//------------------------------------------------
+
+//-- int CALLBACK WinMain(HINSTANCE hInstance, 
+//-- 					HINSTANCE hPrevInstance,
+//-- 					LPSTR lpszCmdLine,
+//-- 					int nCmdShow)
+//-- { 
+
+// ARJ Override browser key handling
+EM_JS(void, browser_prevent_default, (), {
+    document.onkeydown = function(event) {
+            event.returnValue = false;
+    };
+  });
+
+EM_JS(int, browser_load_settings, (), {
+    window.beebem={};
+    window.beebem.disc1='';
+    window.beebem.disc2='';
+    // Parse the query string
+    var urlParams={};
+    var match,
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace("+", " ")); },
+        query  = window.location.search.substring(1);
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+
+    if (urlParams.disc1) {
+      var filename = urlParams.disc1.replace(/^.*[\\\/]/, '');
+      console.log("Loading: "+urlParams.disc1+' to : '+filename);
+      var request = new XMLHttpRequest();
+      // https://cors-anywhere.herokuapp.com/
+      request.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc1, true);
+      request.responseType = "arraybuffer";
+      request.overrideMimeType("application/octet-stream");
+      request.onreadystatechange = function () {
+	if (request.readyState === 4) {
+	  if (request.status === 200) {
+	    console.log("disc1 loaded");
+	    window.beebem.disc1='/usr/local/share/beebem/media/discs/'+filename;
+	    FS.writeFile(window.beebem.disc1, new Uint8Array(request.response), { encoding: "binary" });
+	  } else {
+	    window.beebem.disc1='#error';
+	  }
+	}
+      };
+      request.send();
+    }
+    if (urlParams.disc2) {
+      var filename = urlParams.disc2.replace(/^.*[\\\/]/, '');
+      console.log("Loading: "+urlParams.disc2+' to : '+filename);
+      var request = new XMLHttpRequest();
+      request.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc1, true);
+      request.responseType = "arraybuffer";
+      request.overrideMimeType("application/octet-stream");
+      request.onreadystatechange = function () {
+	if (request.readyState === 4 && request.status === 200) {
+	  console.log("disc2 loaded");
+	  window.beebem.disc2='/usr/local/share/beebem/media/discs/'+filename;
+	  FS.writeFile(window.beebem.disc2, new Uint8Array(request.response), { encoding: "binary" });
+	}
+      };
+      request.send();
+    }
+
+    if (urlParams.autoboot) {
+      console.log('autoboot');
+      window.beebem.autoboot=1;
+      return 1;
+    }
+
+    // auto-load the disc
+    if (urlParams.disc1) {
+      return 2;
+    }
+
+    return 0;
+  });
+
+EM_JS(int, browser_check_disc, (), {
+    if (window.beebem.disc1=='#error') return -1;
+    return window.beebem.disc1.length;
+});
+
+
+
+void multi_iter() {
+  if (autoboot==1) {
+    if (browser_check_disc()<0) {
+      autoboot=0;
+    }
+    if (browser_check_disc()>0) {
+      autoboot=0;
+      mainWin->HandleCommand(IDM_RUNDISC);
+    }
+  }
+  else if (autoboot==2) {
+    if (browser_check_disc()<0) {
+      autoboot=0;
+    }
+    if (browser_check_disc()>0) {
+      autoboot=0;
+      mainWin->HandleCommand(IDM_LOADDISC0);
+    }
+  } else {
+    for (int l=0; l<20; l++) {
+      one_iter();
+    }
+  }
+}
+
+
+int main(int argc, char *argv[]){
+//--	MSG msg;
+
+	//printf("%d\n", testingit(1, 2, 3));
+
+
+
+//	print_message();
+//	SDL_Delay(5000);
+
+/*
+#define STRING_HASH "EG_Widget_Type_ToggleButton"
+	printf(STRING_HASH " %lX\n", EG_MakeStringHash(STRING_HASH) );
+	exit(1);
+*/
+
+//+>
+//	int X11_CapsLock_Down;
+//	Uint32 ticks=SDL_GetTicks();
+
+  // ARJ
+  ticks=SDL_GetTicks();
+  
+//	int mouse_x=0, mouse_y=0, mouse_move_x, mouse_move_y;
+//	BOOL ignore_next_mouse_movement = FALSE;
+//	int buttons=0;
+//<+
+
+//--	hInst = hInstance;
+
+	/* Create global reference to command line args (like windows does)
+	 */
+	__argc = argc;
+	__argv = (char**) argv;
+
+	printf("BeebEm for WebAssembly - https://beeb.webassembly.link\n"); 
+	browser_prevent_default();
+	autoboot = browser_load_settings();
+
+	/* Initialise debugging subsystem.
+	 */
+	Log_Init();
+
+	/* Initialize SDL resources.
+	 */
+	if (! InitialiseSDL(argc, argv)){
+		qFATAL("Unable to initialise SDL library!");
+		exit(1);
+	}
+
+	qINFO("ARJ.");
+/* Initialize GUI API
+ */
+	if (EG_Initialize() == EG_TRUE){
+		qINFO("EG initialized.");
+	}else{
+		qFATAL("EG failed to initialize! Quiting.");
+				exit(1);
+	}
+
+
+	/* Build menus:
+	*/
+	if (InitializeBeebEmGUI(screen_ptr) != EG_TRUE)
+		exit(1);
+
+	/* Initialize fake windows registry:
+	 */
+	InitializeFakeRegistry();
+
+	/* ---------------------------------------
+	 */
+
+	// Create instance of Emulator core:
+	mainWin=new BeebWin();
+	mainWin->Initialise();
+
+	/* ------------------------------------------------------
+	 */
+
+	// Create serial threads
+//--	InitThreads();
+//--	CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) SerialThread,NULL,0,&iSerialThread);
+//--	CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) StatThread,NULL,0,&iStatThread);
+
+	/* -------------------------------------------------0----------
+	 */
+
+//    tlog = fopen("\\trace.log", "wt");
+
+
+	/* Clear SDL event queue
+	 */
+	EG_Draw_FlushEventQueue();
+
+	X11_CapsLock_Down = 0;	// =0 not down, used to emulate a key release in X11 (caps has no release event).
+
+	done = 0;
+#ifdef __EMSCRIPTEN__
+       	//EM_ASM("SDL.defaults.copyOnLock = true; SDL.defaults.discardOnLock = false; SDL.defaults.opaqueFrontBuffer = true");
+	//EM_ASM("SDL.defaults.copyOnLock = false");
+	//emscripten_set_main_loop(multi_iter, 2000, 1);
+	emscripten_set_main_loop(multi_iter, 0, 1);
+#else
+	do {
+	  one_iter();
 	} while(done==0);
+#endif
+
+
+
+
+
+/* THIS WILL EVENTUALLY MOVE INTO beebwin.cpp when the MFC event loop is faked
+ * (until then the rest of this file will be a mess):
+ * -------------------------------------------
+ */
+
+//	pDEBUG(dL"Got to main loop!", dR);
 
 //--	mainWin->KillDLLs();
 

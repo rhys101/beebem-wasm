@@ -79,11 +79,12 @@ extern int cfg_WaitType;
 
 extern int InitialiseSDL(int argc, char *argv[]);
 extern void UninitialiseSDL(void);
+extern void RenderTexture();
 extern void RenderLine(int, int, int);
 extern void SaferSleep(unsigned int);
 extern unsigned char* GetSDLScreenLinePtr(int);
 extern void SetWindowTitle(char*);
-extern int ConvertSDLKeyToBBCKey(SDL_keysym, int*, /* int*, */ int*);
+extern int ConvertSDLKeyToBBCKey(SDL_Keysym, int*, /* int*, */ int*);
 extern void SetBeebEmEmulatorCoresPalette(unsigned char*, int);
 
 extern void AddBytesToSDLSoundBuffer(void*, int);

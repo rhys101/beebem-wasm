@@ -948,7 +948,8 @@ static void DoMode7Row(void) {
   XStep=1;
 
   for(CurrentChar=0;CurrentChar<CRTC_HorizontalDisplayed;CurrentChar++) {
-    byte=CurrentPtr[CurrentChar]; 
+    byte=CurrentPtr[CurrentChar];
+    //printf("%c", byte); // ARJ
     if (byte<32) byte+=128; // fix for naughty programs that use 7-bit control codes - Richard Gellman
     if ((byte & 32) && (Graphics)) HoldGraphChar=byte;
     if ((byte>=128) && (byte<=159)) {
@@ -1099,6 +1100,7 @@ static void DoMode7Row(void) {
   };
   CurrentLineBottom=NextLineBottom;
   NextLineBottom=0;
+  
 }; /* DoMode7Row */
 /*-------------------------------------------------------------------------------------------------------------*/
 /* Actually does the work of decoding beeb memory and plotting the line to X */
@@ -1129,7 +1131,6 @@ void VideoDoScanLine(void) {
       SysVIATriggerCA1Int(0);
       DoCA1Int=0;
     }; 
-
     /* Clear the next 20 scan lines */
     if (!FrameNum) {
       if (VScreenAdjust>0 && VideoState.PixmapLine==0)
@@ -1289,6 +1290,7 @@ void VideoDoScanLine(void) {
     }
 
   }; /* Teletext if */
+  
 }; /* VideoDoScanLine */
 
 /*-------------------------------------------------------------------------------------------------------------*/

@@ -13,7 +13,9 @@
 
 #include "windows.h"
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
+
+#include <stdint.h>
 
 // [TODO] This shouldn't really be here.
 #define SCREEN_WIDTH 640
@@ -344,12 +346,14 @@ static void ProcessGUIOption(EG_Widget *widget_ptr, void *user_ptr)
 
 // TEMP FILE SELECTOR ======================================================
 
+
 static char *gtk_file_selector_filename_ptr;
-static GtkWidget *filew;
+//static GtkWidget *filew;
 int got_file;
 bool was_full_screen = false;
 
 /* Get the selected filename and print it to the console */
+/*
 static void file_ok_sel( GtkWidget        *w,
                          GtkFileSelection *fs )
 {
@@ -443,7 +447,7 @@ int Open_GTK_File_Selector(char *filename_ptr)
 	was_full_screen = false;
 	return(got_file);
 }
-
+*/
 static void RunDisc(EG_Widget *widget_ptr, void *user_ptr)
 {
 	EG_Window *window_ptr = (EG_Window*) user_ptr;
@@ -876,7 +880,7 @@ static void Main_Tick_FullScreen(EG_Widget *widget_ptr, void *user_ptr)
 
 	/* Slight delay to allow hardware to catchup.
 	 */
-	SDL_Delay(200);
+	// ARJ SDL_Delay(200);
 }
 
 static void Main_Button_Quit(EG_Widget *widget_ptr, void *user_ptr)
@@ -900,7 +904,7 @@ static void Main_Button_System(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_system_ptr);
 	EG_Window_Show(gui.win_system_ptr);
 	SetActiveWindow(gui.win_system_ptr);
@@ -915,7 +919,7 @@ static void Main_Button_Screen(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_screen_ptr);
         EG_Window_Show(gui.win_screen_ptr);
         SetActiveWindow(gui.win_screen_ptr);
@@ -930,7 +934,7 @@ static void Main_Button_Sound(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_sound_ptr);
         EG_Window_Show(gui.win_sound_ptr);
         SetActiveWindow(gui.win_sound_ptr);
@@ -946,7 +950,7 @@ static void Main_Button_ROMs(EG_Widget *widget_ptr, void *user_ptr)
 
         EG_Window_Hide(gui.win_menu_ptr);
 
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_roms_ptr);
         EG_Window_Show(gui.win_roms_ptr);
         SetActiveWindow(gui.win_roms_ptr);
@@ -961,7 +965,7 @@ static void Main_Button_Speed(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_speed_ptr);
         EG_Window_Show(gui.win_speed_ptr);
         SetActiveWindow(gui.win_speed_ptr);
@@ -975,13 +979,13 @@ static void Main_Button_About(EG_Widget *widget_ptr, void *user_ptr)
         tmp = widget_ptr;
         tmp2 = user_ptr;
 
-        EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+        //EG_Window_Hide(gui.win_menu_ptr);
+	// ARJ SDL_Delay(100);
 //        EG_Window_Show(gui.win_about_ptr);
 //        SetActiveWindow(gui.win_about_ptr);
 
 //	EG_TextBox(screen_ptr,"BeebEm", ABOUT_MESSAGE, "Back", NULL, NULL, NULL, 1);
-
+/*
 	EG_Draw_FlushEventQueue();
                 //printf("MESSAGE BOX\n");
                 EG_MessageBox(screen_ptr, EG_MESSAGEBOX_INFORMATION
@@ -989,6 +993,8 @@ static void Main_Button_About(EG_Widget *widget_ptr, void *user_ptr)
                  , 0);
 
 	EG_Window_Show(gui.win_menu_ptr);
+*/
+	printf("BeebEm for UNIX compiled for Web Assembly\n");
 }
 
 static void Main_Button_Devices(EG_Widget *widget_ptr, void *user_ptr)
@@ -1000,7 +1006,7 @@ static void Main_Button_Devices(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_devices_ptr);
         EG_Window_Show(gui.win_devices_ptr);
         SetActiveWindow(gui.win_devices_ptr);
@@ -1015,7 +1021,7 @@ static void Main_Button_Disks(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_disks_ptr);
         EG_Window_Show(gui.win_disks_ptr);
         SetActiveWindow(gui.win_disks_ptr);
@@ -1030,7 +1036,7 @@ static void Main_Button_Tapes(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_tapes_ptr);
         EG_Window_Show(gui.win_tapes_ptr);
         SetActiveWindow(gui.win_tapes_ptr);
@@ -1045,7 +1051,7 @@ static void Main_Button_Keyboard(EG_Widget *widget_ptr, void *user_ptr)
         tmp2 = user_ptr;
 
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_keyboard_ptr);
         EG_Window_Show(gui.win_keyboard_ptr);
         SetActiveWindow(gui.win_keyboard_ptr);
@@ -1059,7 +1065,7 @@ static void Main_Button_AMX(EG_Widget *widget_ptr, void *user_ptr)
         tmp = widget_ptr;
         tmp2 = user_ptr;
         EG_Window_Hide(gui.win_menu_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	ReCenterWindow(gui.win_amx_ptr);
         EG_Window_Show(gui.win_amx_ptr);
         SetActiveWindow(gui.win_amx_ptr);
@@ -1419,7 +1425,7 @@ static void System_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_system_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -1621,14 +1627,14 @@ static void Screen_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_screen_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
 
 static void Change_Windowed_Resolution(EG_Widget *widget_ptr, void *user_ptr)
 {
-	int value = (int) user_ptr;
+	intptr_t value = (intptr_t) user_ptr;
 	cfg_Windowed_Resolution = value;
 
 	EG_Window_Hide(gui.win_screen_ptr);
@@ -1650,7 +1656,7 @@ static void Change_Windowed_Resolution(EG_Widget *widget_ptr, void *user_ptr)
 
 static void Change_Fullscreen_Resolution(EG_Widget *widget_ptr, void *user_ptr)
 {
-	int value = (int) user_ptr;
+	intptr_t value = (intptr_t) user_ptr;
 	cfg_Fullscreen_Resolution = value;
 
 	EG_Window_Hide(gui.win_screen_ptr);
@@ -2114,7 +2120,7 @@ static void Sound_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_sound_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2294,7 +2300,7 @@ static void ROMs_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_roms_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2379,7 +2385,7 @@ static void Speed_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_speed_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2584,7 +2590,7 @@ static void Devices_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 //	int count = 0;
 
 	EG_Window_Hide(gui.win_devices_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2743,7 +2749,7 @@ static void Tapes_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_tapes_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2886,7 +2892,7 @@ static void Disks_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_disks_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -2949,7 +2955,7 @@ static void Keyboard_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_keyboard_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }
@@ -3245,7 +3251,7 @@ static void AMX_Button_Back(EG_Widget *widget_ptr, void *user_ptr)
 	tmp2 = user_ptr;
 
 	EG_Window_Hide(gui.win_amx_ptr);
-	SDL_Delay(100);
+	// ARJ SDL_Delay(100);
 	EG_Window_Show(gui.win_menu_ptr);
 	SetActiveWindow(gui.win_menu_ptr);
 }

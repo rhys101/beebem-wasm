@@ -380,7 +380,7 @@ int EG_MessageBox(SDL_Surface *surface_ptr, int type, const char *title_ptr
                         EG_Window_ProcessEvent(window_ptr, &e, 0, 0);
 
                 }
-                SDL_Delay(50);
+                // ARJ SDL_Delay(50);
                 EG_Window_ProcessEvent(window_ptr, NULL, 0,0);
         }
         EG_Window_DestroyAllChildWidgets(window_ptr);
