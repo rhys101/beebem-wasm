@@ -1364,7 +1364,7 @@ static struct BeebKeyTrans SDLtoBeebEmKeymap[]={
 {SDLK_RIGHT,		7,9},    // RIGHT
 {SDLK_DOWN,		2,9},    // DOWN
 
-{SDLK_DELETE,		5,9},    // DELETE
+{SDLK_DELETE,		-2,-2},    // BREAK (WAS DELETE)
 {SDLK_BACKSPACE,	5,9},    // DELETE
 
 {SDLK_INSERT,		6,9},	// COPY
