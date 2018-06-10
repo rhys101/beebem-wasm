@@ -638,6 +638,7 @@ int main(int argc, char *argv[]){
 	__argv = (char**) argv;
 
 	printf("BeebEm for WebAssembly - https://beeb.webassembly.link\n"); 
+	printf("PC: press shift-del to boot\nMac : press fn-shift-backspace to boot\n"); 
 	browser_prevent_default();
 	autoboot = browser_load_settings();
 
