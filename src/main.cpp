@@ -506,7 +506,7 @@ EM_JS(void, browser_prevent_default, (), {
 
 EM_JS(int, browser_load_settings, (), {
     window.beebem={};
-    window.beebem.disc1='';
+    window.beebem.disc1='/usr/local/share/beebem/media/discs/blank.ssd';
     window.beebem.disc2='';
     // Parse the query string
     var urlParams={};
@@ -518,42 +518,76 @@ EM_JS(int, browser_load_settings, (), {
        urlParams[decode(match[1])] = decode(match[2]);
 
     if (urlParams.disc1) {
-      var filename = urlParams.disc1.replace(/^.*[\\\/]/, '');
-      console.log("Loading: "+urlParams.disc1+' to : '+filename);
-      var request = new XMLHttpRequest();
+      var filename_disc1 = urlParams.disc1.replace(/^.*[\\\/]/, '');
+      window.beebem.disc1='#';
+      console.log("Loading: "+urlParams.disc1+' to : '+filename_disc1);
+      var request_disc1 = new XMLHttpRequest();
       // https://cors-anywhere.herokuapp.com/
-      request.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc1, true);
-      request.responseType = "arraybuffer";
-      request.overrideMimeType("application/octet-stream");
-      request.onreadystatechange = function () {
-	if (request.readyState === 4) {
-	  if (request.status === 200) {
+      request_disc1.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc1, true);
+      request_disc1.responseType = "arraybuffer";
+      request_disc1.overrideMimeType("application/octet-stream");
+      request_disc1.onreadystatechange = function () {
+	if (request_disc1.readyState === 4) {
+	  if (request_disc1.status === 200) {
 	    console.log("disc1 loaded");
-	    window.beebem.disc1='/usr/local/share/beebem/media/discs/'+filename;
-	    FS.writeFile(window.beebem.disc1, new Uint8Array(request.response), { encoding: "binary" });
+	    window.beebem.disc1='/usr/local/share/beebem/media/discs/'+filename_disc1;
+	    FS.writeFile(window.beebem.disc1, new Uint8Array(request_disc1.response), { encoding: "binary" });
 	  } else {
 	    window.beebem.disc1='#error';
 	  }
 	}
       };
-      request.send();
+      request_disc1.send();
     }
     if (urlParams.disc2) {
-      var filename = urlParams.disc2.replace(/^.*[\\\/]/, '');
-      console.log("Loading: "+urlParams.disc2+' to : '+filename);
-      var request = new XMLHttpRequest();
-      request.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc1, true);
-      request.responseType = "arraybuffer";
-      request.overrideMimeType("application/octet-stream");
-      request.onreadystatechange = function () {
-	if (request.readyState === 4 && request.status === 200) {
+      var filename_disc2 = urlParams.disc2.replace(/^.*[\\\/]/, '');
+      console.log("Loading: "+urlParams.disc2+' to : '+filename_disc2);
+      var request_disc2 = new XMLHttpRequest();
+      request_disc2.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.disc2, true);
+      request_disc2.responseType = "arraybuffer";
+      request_disc2.overrideMimeType("application/octet-stream");
+      request_disc2.onreadystatechange = function () {
+	if (request_disc2.readyState === 4 && request_disc2.status === 200) {
 	  console.log("disc2 loaded");
-	  window.beebem.disc2='/usr/local/share/beebem/media/discs/'+filename;
-	  FS.writeFile(window.beebem.disc2, new Uint8Array(request.response), { encoding: "binary" });
+	  window.beebem.disc2='/usr/local/share/beebem/media/discs/'+filename_disc2;
+	  FS.writeFile(window.beebem.disc2, new Uint8Array(request_disc2.response), { encoding: "binary" });
 	}
       };
-      request.send();
+      request_disc2.send();
     }
+    if (urlParams.bbcromd) {
+      var filename_bbcromd = urlParams.bbcromd.replace(/^.*[\\\/]/, '');
+      console.log("Loading: "+urlParams.bbcromd+' to : roms/'+filename_bbcromd);
+      var request_bbcromd = new XMLHttpRequest();
+      request_bbcromd.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.bbcromd, true);
+      request_bbcromd.responseType = "arraybuffer";
+      request_bbcromd.overrideMimeType("application/octet-stream");
+      request_bbcromd.onreadystatechange = function () {
+	if (request_bbcromd.readyState === 4 && request_bbcromd.status === 200) {
+	  console.log("Rom Loaded");
+	  FS.writeFile("/usr/local/share/beebem/roms/bbc/romd.rom", new Uint8Array(request_bbcromd.response), { encoding: "binary" });
+	}
+      };
+      request_bbcromd.send();
+    }
+    if (urlParams.bbcromc) {
+      var filename_bbcromc = urlParams.bbcromc.replace(/^.*[\\\/]/, '');
+      console.log("Loading: "+urlParams.bbcromc+' to : roms/'+filename_bbcromc);
+      var request_bbcromc = new XMLHttpRequest();
+      request_bbcromc.open('GET', 'https://cors-anywhere.webassembly.link/'+urlParams.bbcromc, true);
+      request_bbcromc.responseType = "arraybuffer";
+      request_bbcromc.overrideMimeType("application/octet-stream");
+      request_bbcromc.onreadystatechange = function () {
+	if (request_bbcromc.readyState === 4 && request_bbcromc.status === 200) {
+	  console.log("Rom Loaded");
+	  FS.writeFile("/usr/local/share/beebem/roms/bbc/romc.rom", new Uint8Array(request_bbcromc.response), { encoding: "binary" });
+	}
+      };
+      request_bbcromc.send();
+    }
+    if (urlParams.bbcromd && urlParams.bbcromc) {return 0x12;}
+    if (urlParams.bbcromd) {return 0x10;}
+    if (urlParams.bbcromc) {return 0x11;}
 
     if (urlParams.autoboot) {
       console.log('autoboot');
@@ -566,38 +600,70 @@ EM_JS(int, browser_load_settings, (), {
       return 2;
     }
 
-    return 0;
+    
+    return 3;
   });
 
-EM_JS(int, browser_check_disc, (), {
-    if (window.beebem.disc1=='#error') return -1;
-    return window.beebem.disc1.length;
+EM_JS(const char*, browser_check_disc, (), {
+    //if (window.beebem.disc1=='#error') return -1;
+    //return window.beebem.disc1.length;
+    var lengthBytes = lengthBytesUTF8(window.beebem.disc1)+1;
+    var stringOnWasmHeap = _malloc(lengthBytes);
+    stringToUTF8(window.beebem.disc1, stringOnWasmHeap, lengthBytes+1);
+    return stringOnWasmHeap;
 });
 
 
 
 void multi_iter() {
-  if (autoboot==1) {
-    if (browser_check_disc()<0) {
-      autoboot=0;
+  if (autoboot!=0) {
+    if (autoboot==1) {
+      if (fopen(browser_check_disc(), "rb") != NULL) {
+	mainWin->HandleCommand(IDM_RUNDISC);
+	autoboot=0;
+      }
     }
-    if (browser_check_disc()>0) {
-      autoboot=0;
-      mainWin->HandleCommand(IDM_RUNDISC);
+    else if (autoboot==2) {
+      if (fopen(browser_check_disc(), "rb") != NULL) {
+	mainWin->HandleCommand(IDM_LOADDISC0);
+	autoboot=0;
+      }
     }
-  }
-  else if (autoboot==2) {
-    if (browser_check_disc()<0) {
-      autoboot=0;
-    }
-    if (browser_check_disc()>0) {
+    else if (autoboot==3) {
+      // load in blank disk
       autoboot=0;
       mainWin->HandleCommand(IDM_LOADDISC0);
+      mainWin->HandleCommand(IDM_WPDISC0);
+    } else if (autoboot==0x10) {
+      // Check for romd
+      if (fopen("/usr/local/share/beebem/roms/bbc/romd.rom","rb") !=NULL) {
+	mainWin->HandleCommand(IDM_LOADDISC0);
+	mainWin->HandleCommand(IDM_WPDISC0);
+	mainWin->HandleCommand(ID_FILE_RESET);
+	autoboot = 0;
+      }
+    } else if (autoboot==0x11) {
+      // Check for romc
+      if (fopen("/usr/local/share/beebem/roms/bbc/romc.rom","rb") !=NULL) {
+	mainWin->HandleCommand(IDM_LOADDISC0);
+	mainWin->HandleCommand(IDM_WPDISC0);
+	mainWin->HandleCommand(ID_FILE_RESET);
+	autoboot = 0;
+      }
+    } else if (autoboot==0x12) {
+      // Check for romd and romc
+      if (fopen("/usr/local/share/beebem/roms/bbc/romd.rom","rb") !=NULL) {
+	  if (fopen("/usr/local/share/beebem/roms/bbc/romc.rom","rb") !=NULL) {
+	    mainWin->HandleCommand(IDM_LOADDISC0);
+	    mainWin->HandleCommand(IDM_WPDISC0);
+	    mainWin->HandleCommand(ID_FILE_RESET);
+	    autoboot = 0;
+	  }
+      }
     }
-  } else {
-    for (int l=0; l<20; l++) {
-      one_iter();
-    }
+  }
+  for (int l=0; l<20; l++) {
+    one_iter();
   }
 }
 

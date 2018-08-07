@@ -1113,7 +1113,7 @@ void BeebReadRoms(void) {
 					if (fread(
 					 Roms[romslot],1,16384,InFile) < 16384){
 						pFATAL(dL"Paged ROM 0x%X [%s] load failed (file is too small)..", dR, romslot, fullname);
-						exit(1);
+						//exit(1);
 					}else{
 						char tmp[10];
 						if (fread(tmp, 1, 1, InFile)==0){
@@ -1126,7 +1126,7 @@ void BeebReadRoms(void) {
 				fclose(InFile);
 				}else{
 					pFATAL(dL"Paged ROM 0x%X [%s] load failed (unable to open file)..", dR, romslot, fullname);
-					exit(1);
+					// exit(1);
 				}
 			}else{pINFO(dL"Paged ROM 0x%X is set as '%s'", dR, romslot, RomName);}
 		}

@@ -5180,7 +5180,7 @@ void BeebWin::HandleCommand(int MenuId)
 		break;
 
     case ID_FILE_RESET:
-		ResetBeebSystem(MachineType,TubeEnabled,0);
+		ResetBeebSystem(MachineType,TubeEnabled,1);
 		break;
 
 	case ID_MODELB:
